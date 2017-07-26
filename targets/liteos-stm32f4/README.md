@@ -65,9 +65,3 @@ make -f ./targets/liteos-stm32f4/Makefile.liteos clean
 ### 5. Running JerryScript LED blink example
 
 You may have to press `RESET` on the board after the flash.
-
-
-```
-
-
-

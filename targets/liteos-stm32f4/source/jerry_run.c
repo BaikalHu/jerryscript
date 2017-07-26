@@ -13,8 +13,16 @@
  * limitations under the License.
  */
 
-#include "jerryscript.h"
+#include <stdio.h>
+#include <stdarg.h>
 #include "los_bsp_led.h"
+#include "jerryscript.h"
+#include "jerryscript-port.h"
+
+/**
+ * JerryScript log level
+ */
+static jerry_log_level_t jerry_log_level = JERRY_LOG_LEVEL_ERROR;
 
 
 /**
@@ -51,7 +59,6 @@ js_delay (const jerry_value_t func_value, /**< function object */
 {
   if (args_cnt != 1)
   {
-
     return jerry_create_boolean (false);
   }
 
@@ -68,8 +75,7 @@ js_delay (const jerry_value_t func_value, /**< function object */
 static void
 init_jerry ()
 {
-  jerry_init (JERRY_INIT_SHOW_OPCODES | JERRY_INIT_DEBUGGER |JERRY_INIT_MEM_STATS);
-
+  jerry_init (JERRY_INIT_EMPTY);
   /* Create an empty JS object */
   jerry_value_t object = jerry_create_object ();
 
@@ -128,7 +134,56 @@ void run ()
   test_jerry ();
 
   jerry_cleanup ();
-} 
+} /* run */
+
+/**
+ * Aborts the program.
+ */
+void jerry_port_fatal (jerry_fatal_code_t code)
+{
+  exit (1);
+} /* jerry_port_fatal */
 
 
+/**
+ * Provide log message implementation for the engine.
+ */
+void
+jerry_port_log (jerry_log_level_t level, /**< log level */
+                const char *format, /**< format string */
+                ...)  /**< parameters */
+{
+  if (level <= jerry_log_level)
+  {
+    va_list args;
+    va_start (args, format);
+    vfprintf (stderr, format, args);
+    va_end (args);
+  }
+} /* jerry_port_log */
 
+/**
+ * Dummy function to get the time zone.
+ *
+ * @return true
+ */
+bool
+jerry_port_get_time_zone (jerry_time_zone_t *tz_p)
+{
+  /* We live in UTC. */
+  tz_p->offset = 0;
+  tz_p->daylight_saving_time = 0;
+
+  return true;
+} /* jerry_port_get_time_zone */
+
+/**
+ * Dummy function to get the current time.
+ *
+ * @return 0
+ */
+double
+jerry_port_get_current_time (void)
+{
+  return 0;
+} /* jerry_port_get_current_time */

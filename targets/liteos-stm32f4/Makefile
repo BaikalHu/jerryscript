@@ -29,7 +29,7 @@ BINDIR ?= $(JERRYDIR)/targets/liteos-stm32f4/bin/
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-INCLUDES += -I$(JERRYDIR)/jerry-core/
+INCLUDES += -I$(JERRYDIR)/jerry-core
 
 
 # Add the jerry lib

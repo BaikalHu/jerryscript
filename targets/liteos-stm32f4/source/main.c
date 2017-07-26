@@ -1,41 +1,31 @@
+/* Copyright JS Foundation and other contributors, http://js.foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "los_sys.h"
 #include "los_tick.h"
 #include "los_task.ph"
 #include "los_config.h"
-
 #include "los_bsp_led.h"
 #include "los_bsp_key.h"
 #include "los_bsp_uart.h"
+#include "los_bsp_adapter.h"
 
 #include "stm32f429i_discovery.h"
-//#include "stm32f4xx_conf.h"
-
 #include <string.h>
-//#include <stdio.h>
-
 #include "jerryscript.h"
 #include "jerry_run.h"
-
-int _write(int file, char *ptr, int len)
-{
-#if 0
-	int idx;
-	for(idx = 0; idx < len; idx++)
-	{
-		LOS_EvbUartWriteByte((char)(*ptr));
-		ptr++;
-	}
-	return len;
-#else
-	LOS_EvbUartWriteStr(ptr);
-	return len;
-
-#endif
-}
-
-
-extern void LOS_EvbSetup(void);
-
 
 static UINT32 g_uwboadTaskID;
 LITE_OS_SEC_TEXT VOID LOS_BoadExampleTskfunc(VOID)
@@ -117,34 +107,17 @@ LITE_OS_SEC_TEXT_INIT
 int main(void)
 {
     UINT32 uwRet;
-    /*
-		add you hardware init code here
-		for example flash, i2c , system clock ....
-    */
-	HAL_Init();
-	SystemClock_Config();
+    HAL_Init();
+    SystemClock_Config();
 
     LOS_EvbSetup();
-	/*Init LiteOS kernel */
     uwRet = LOS_KernelInit();
     if (uwRet != LOS_OK) {
         return LOS_NOK;
     }
-	/* Enable LiteOS system tick interrupt */
     LOS_EnableTick();
-	
-    /* 
-        Notice: add your code here
-        here you can create task for your function 
-        do some hw init that need after systemtick init
-    */
-
     LOS_BoadExampleEntry();
 		
-    /* Kernel start to run */
     LOS_Start();
     for (;;);
-    /* Replace the dots (...) with your own code.  */
 }
-
-
